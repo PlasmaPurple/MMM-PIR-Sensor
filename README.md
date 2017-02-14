@@ -65,6 +65,13 @@ The following properties can be configured:
 				<br><b>Default value:</b> <code>1</code>
 			</td>
 		</tr>
+		<tr>
+			<td><code>offDelayTime</code></td>
+			<td>Time in seconds to delay HDMI off. 0 means no delay, screen is disabled as soon as PIR sensor indicates no motion detected. Has no effect if relay is used, only used for HDMI off. <br/>
+			<br/><b>Possible values:</b> <code>int</code>
+			<br/><b>Default value:</b> <code>0</code>
+			</td>
+		</tr>
 	</tbody>
 </table>
 
