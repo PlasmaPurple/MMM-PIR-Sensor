@@ -11,6 +11,9 @@ const NodeHelper = require('node_helper');
 const Gpio = require('onoff').Gpio;
 const exec = require('child_process').exec;
 
+var offDelayTime; //time to delay turning off the hdmi, set from config
+var offDelay;  //object holding delay timeout
+
 module.exports = NodeHelper.create({
   start: function () {
     this.started = false;
@@ -22,6 +25,7 @@ module.exports = NodeHelper.create({
     }
     else if (this.config.relayPIN == false){
       exec("/opt/vc/bin/tvservice --preferred && sudo chvt 6 && sudo chvt 7", null);
+      clearTimeout(offDelay); //if motion is detected, stop the screen off timeout
     }
   },
 
@@ -30,7 +34,10 @@ module.exports = NodeHelper.create({
       this.relay.writeSync(this.config.relayOffState);
     }
     else if (this.config.relayPIN == false){
-      exec("/opt/vc/bin/tvservice -o", null);
+      //HDMI off in a timeout, default to 0 so display off happen asap
+      offDelay = setTimeout(function () {
+        exec("/opt/vc/bin/tvservice -o", null);
+      }, offDelayTime*1000);
     }
   },
 
@@ -45,6 +52,9 @@ module.exports = NodeHelper.create({
       // exec("echo '" + this.config.sensorPIN.toString() + "' > /sys/class/gpio/export", null);
       // exec("echo 'in' > /sys/class/gpio/gpio" + this.config.sensorPIN.toString() + "/direction", null);
 
+      //Setup display off delay
+      offDelayTime = this.config.offDelayTime;
+      
       if (this.config.relayPIN) {
         this.relay = new Gpio(this.config.relayPIN, 'out');
         this.relay.writeSync(this.config.relayOnState);
